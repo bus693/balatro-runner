@@ -14,12 +14,16 @@ This script only works on macOS and requires python3. (It's tested on system pyt
 
 1. Edit the `MODS_SRC_PATH` to set it to a folder that will contain your mods, but wait before you move your mods.
 
-2. This script expects your mods to be installed by source control in two subfolders within `MODS_SRC_PATH`:
+2. This script expects your mods to be in two subfolders within `MODS_SRC_PATH`:
 
 - `/core`: the subset of mods you want to always be running
 - `/all`: all your other mods
 
 ## Run
+
+First, follow the install instructions. The runner will not work if it can't find your mods.
+
+Then, you can choose between the following commands.
 
 - `python3 run_balatro.py` runs the Steam client without any mods
 - `python3 run_balatro.py core` (or `python3 run_balatro.py core -v` for verbose mode) runs the game with only the core mods
