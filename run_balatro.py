@@ -6,7 +6,7 @@ MODS_SRC_PATH = "~/Documents/balatro/mods/"
 MODS_INSTALL_PATH = "~/Library/Application Support/Balatro/Mods/"
 LOVELY_RUNNER_PATH = "~/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely_macos.sh"
 
-# no_mods: just lovely, nothing else
+# no_mods: no mods at all, not even lovely
 # core: vanilla with a few QOL mods
 # all: all the mods, toggle individual mods using smods in-game mod selector
 RUN_TYPES = ["no_mods", "core", "all"]
