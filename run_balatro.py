@@ -28,7 +28,6 @@ def __install(dir_name):
     if not item.is_dir():
       continue
     posix_target = Path(f"{MODS_INSTALL_PATH}/{item.name}").expanduser()
-    posix_source = item
     posix_target.symlink_to(item)
     if verbose:
       print(f"Creating symlink for {item.name}")

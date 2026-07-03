@@ -19,6 +19,10 @@ This script only works on macOS and requires python3. (It's tested on system pyt
 - `/core`: the subset of mods you want to always be running
 - `/all`: all your other mods
 
+Here is an example of what your mods setup could look like. (Extra subfolders like `lovely` or `archive` are currently ignored.)
+
+<img src="example_folder_setup.png" width="200">
+
 ## Run
 
 First, follow the install instructions. The runner will not work if it can't find your mods.
