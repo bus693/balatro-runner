@@ -1,6 +1,6 @@
 # balatro-runner
 
-Run Balatro with a configurable set of mods.
+Run Balatro with groups of mods.
 
 ## Why
 
@@ -14,12 +14,9 @@ This script only works on macOS and requires python3. (It's tested on system pyt
 
 1. Edit the `MODS_SRC_PATH` to set it to a folder that will contain your mods, but wait before you move your mods.
 
-2. This script expects your mods to be in two subfolders within `MODS_SRC_PATH`:
+2. This script expects your mods to be in subfolders within `MODS_SRC_PATH`:
 
-- `/core`: the subset of mods you want to always be running
-- `/all`: all your other mods
-
-Here is an example of what your mods setup could look like. (Extra subfolders like `lovely` or `archive` are currently ignored.)
+Here is an example of what your mods setup could look like.
 
 <img src="example_folder_setup.png" width="200">
 
@@ -29,9 +26,8 @@ First, follow the install instructions. The runner will not work if it can't fin
 
 Then, you can choose between the following commands.
 
-- `python3 run_balatro.py` runs the Steam client without any mods
-- `python3 run_balatro.py core` (or `python3 run_balatro.py core -v` for verbose mode) runs the game with only the core mods
-- `python3 run_balatro.py all` (or `python3 run_balatro.py all -v` for verbose mode) runs the game with all the mods, including the ones in `/core` and `/all`. You can use Steamodded's in-game mod list interface to decide which ones to toggle.
+- `python3 run_balatro.py`: Including no groups runs the game without any mods. It does not use the lovely run script.
+- `python3 run_balatro.py core all`: You can include any number of groups. Including groups installs all the mods within those groups. Mods within lovely's `blacklist.txt` are still disabled. For verbose mode, `python3 run_balatro.py core all -v`.
 
 ## Troubleshooting
 
