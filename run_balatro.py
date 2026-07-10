@@ -5,6 +5,7 @@ from sys import exit, stderr
 
 MODS_SRC_PATH = "~/Documents/balatro/mods/"
 MODS_INSTALL_PATH = "~/Library/Application Support/Balatro/Mods/"
+LOVELY_BLACKLIST_PATH = "~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt"
 LOVELY_RUNNER_PATH = "~/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely_macos.sh"
 
 # no_mods: no mods at all, not even lovely
@@ -40,11 +41,22 @@ def __install(dir_name):
     posix_target.symlink_to(item)
     if verbose:
       print(f"  Creating symlink for {item.name}")
-      
+
+def __clear_blacklist():
+  blacklist_loc = Path("~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt").expanduser()
+  if not blacklist_loc.exists():
+    print("  blacklist.txt does not exist; did not clear.", file=stderr)
+    return
+  if not blacklist_loc.is_file():
+    print("  blacklist.txt is not a file; did not clear.", file=stderr)
+    return
+  blacklist_loc.write_text("")
+
 def main():
   parser = ArgumentParser()
   parser.add_argument("groups", nargs="*")
   parser.add_argument("-v", "--verbose", action="store_true")
+  parser.add_argument("--clear-blacklist", action="store_true")
   args = parser.parse_args()
   global verbose
   verbose = args.verbose
@@ -52,6 +64,8 @@ def main():
   print("Running Balatro via bus693/balatro-runner")
 
   if not len(args.groups):
+    if args.clear_blacklist:
+      print("Running the game without mods; skipped clearing blacklist")
     run(["open", "-a", "Balatro"])
     return
 
@@ -64,6 +78,11 @@ def main():
     if verbose:
       print(f"Installing group {group}")
     __install(group)
+
+  if args.clear_blacklist:
+    if verbose:
+      print("Clearing blacklist.")
+    __clear_blacklist()
 
   if verbose:
     print("Done installing mods.")
