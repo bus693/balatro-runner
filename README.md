@@ -28,6 +28,7 @@ Then, you can choose between the following commands.
 
 - `python3 run_balatro.py`: Including no groups runs the game without any mods. It does not use the lovely run script.
 - `python3 run_balatro.py core all`: You can include any number of groups. Including groups installs all the mods within those groups. Mods within lovely's `blacklist.txt` are still disabled. For verbose mode, `python3 run_balatro.py core all -v`.
+- `python3 run_balatro.py core all --clear-blacklist`: By default, any mods on the blacklist (typically, this is from disabling the mod using smods' in-game mod selector) will not run. Clearing the blacklist enables all the mods in your groups.
 
 ## Troubleshooting
 
