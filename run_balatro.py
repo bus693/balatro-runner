@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from pathlib import Path
 from subprocess import run
-from sys import exit, stderr
+from sys import excepthook, exit, stderr
 
 MODS_SRC_PATH = "~/Documents/balatro/mods/"
 MODS_INSTALL_PATH = "~/Library/Application Support/Balatro/Mods/"
@@ -93,5 +93,8 @@ def main():
   run(["sh", Path(LOVELY_RUNNER_PATH).expanduser()])
 
    
-
-main()
+try:
+  main()
+except KeyboardInterrupt:
+  print("\nInterrupted by user, closing Balatro.", file=stderr)
+  exit(130)
