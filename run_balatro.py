@@ -34,13 +34,13 @@ def __install(dir_name):
     print(f"Location not allowed {dir_name}", file=stderr)
     print("Aborting", file=stderr)
     exit(1)
-  for item in src_folder_path.iterdir():
-    if not item.is_dir():
+  for subdir in src_folder_path.iterdir():
+    if not subdir.resolve().is_dir():
       continue
-    posix_target = Path(f"{MODS_INSTALL_PATH}/{item.name}").expanduser()
-    posix_target.symlink_to(item)
+    posix_target = Path(f"{MODS_INSTALL_PATH}/{subdir.name}").expanduser()
+    posix_target.symlink_to(subdir)
     if verbose:
-      print(f"  Creating symlink for {item.name}")
+      print(f"  Creating symlink for {subdir.name}")
 
 def __clear_blacklist():
   blacklist_loc = Path("~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt").expanduser()
