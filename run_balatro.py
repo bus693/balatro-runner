@@ -15,6 +15,7 @@ class EXIT_CODES(Enum):
   MOD_OUTSIDE_MODS_FOLDER = 4,
   GROUP_DOES_NOT_EXIST_IN_CONFIG = 5,
   GROUP_DOES_NOT_EXIST_IN_INPUT = 6,
+  MOD_NOT_FOUND = 7,
   SIGINT = 130,
 
 verbose = None
@@ -56,28 +57,26 @@ def __clean_up_mods():
       print(f"  Removing symlink for {item.name}")
     item.unlink()
 
-def __install(mods):
-  for mod in mods:
-    with open(FOLDERS_JSON) as f:
-      src_folder = Path(loads("".join(f.readlines()))["mod_source"]).expanduser()
-    mod_src_folder = src_folder / mod
-    # no directory traversal outside MODS_SRC_PATH
-    is_safe_location = mod_src_folder.resolve().is_relative_to(src_folder)
-    if not is_safe_location:
-      print(f"Location not allowed {mod}", file=stderr)
-      print("Aborting", file=stderr)
-      exit(EXIT_CODES.MOD_OUTSIDE_MODS_FOLDER.value)
+def __install(src_folder, mod):
+  mod_src_folder = src_folder / mod
+  # no directory traversal outside MODS_SRC_PATH
+  is_safe_location = mod_src_folder.resolve().is_relative_to(src_folder)
+  if not is_safe_location:
+    print(f"Location not allowed {mod}", file=stderr)
+    print("Aborting", file=stderr)
+    exit(EXIT_CODES.MOD_OUTSIDE_MODS_FOLDER.value)
 
-    if not mod_src_folder.resolve().is_dir():
-      # TODO: install
-      print(f"Cannot find mod {mod}, skipping", file=stderr)
-      continue
+  if not mod_src_folder.resolve().is_dir():
+    # TODO: install
+    print(f"  Cannot find mod {mod}", file=stderr)
+    print(f"  Aborting", file=stderr)
+    exit(EXIT_CODES.MOD_NOT_FOUND.value)
 
-    target_mod_name = "@".join(mod.split("/"))
-    posix_target = MODS_INSTALL_PATH / target_mod_name
-    if verbose:
-      print(f"  Creating symlink for {mod}")
-    posix_target.symlink_to(mod_src_folder)
+  target_mod_name = "@".join(mod.split("/"))
+  posix_target = MODS_INSTALL_PATH / target_mod_name
+  if verbose:
+    print(f"  Creating symlink for {mod}")
+  posix_target.symlink_to(mod_src_folder)
 
 def __get_group_mods_from_config():
   groups_config_path = Path(__file__).parent / "groups.json"
@@ -118,7 +117,7 @@ def __clear_blacklist():
 
 def main():
   parser = ArgumentParser()
-  parser.add_argument("groups", nargs="*")
+  parser.add_argument("mods_or_groups", nargs="*")
   parser.add_argument("-v", "--verbose", action="store_true")
   parser.add_argument("--clear-blacklist", action="store_true")
   args = parser.parse_args()
@@ -129,10 +128,12 @@ def main():
 
   if not folders_json.exists():
     __setup_folders_json()
+  with open(FOLDERS_JSON) as f:
+    src_folder = Path(loads("".join(f.readlines()))["mod_source"]).expanduser()
 
   print("Running Balatro via bus693/balatro-runner")
 
-  if not len(args.groups):
+  if not len(args.mods_or_groups):
     if args.clear_blacklist:
       print("Running the game without mods; skipped clearing blacklist")
     run(["open", "-a", "Balatro"])
@@ -144,8 +145,11 @@ def main():
   if verbose:
     print(dumps(group_mods, indent=2))
 
+  groups = [_ for _ in args.mods_or_groups if '/' not in _]
+  mods = [_ for _ in args.mods_or_groups if '/' in _]
+
   # Check that all groups are valid before we install
-  for group_name in args.groups:
+  for group_name in groups:
     if not group_name in group_mods:
       print(f"Group '{group_name}' does not exist", file=stderr)
       exit(EXIT_CODES.GROUP_DOES_NOT_EXIST_IN_INPUT.value)
@@ -154,10 +158,16 @@ def main():
     print("Installing mods...")
   __clean_up_mods()
 
-  for group_name in args.groups:
+  for group_name in groups:
     if verbose:
       print(f"Installing group {group_name}")
-    __install(group_mods[group_name])
+    for mod in group_mods[group_name]:
+      __install(src_folder, mod)
+
+  for mod in mods:
+    if verbose:
+      print(f"Installing mod {mod}")
+    __install(src_folder, mod)
 
   if args.clear_blacklist:
     if verbose:
