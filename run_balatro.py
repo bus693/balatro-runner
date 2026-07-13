@@ -13,6 +13,8 @@ LOVELY_RUNNER_PATH = "~/Library/Application Support/Steam/steamapps/common/Balat
 class EXIT_CODES(Enum):
   DEPTH_EXCEEDED = 3,
   MOD_OUTSIDE_MODS_FOLDER = 4,
+  GROUP_DOES_NOT_EXIST_IN_CONFIG = 5,
+  GROUP_DOES_NOT_EXIST_IN_INPUT = 6,
   SIGINT = 130,
 
 verbose = None
@@ -28,7 +30,7 @@ def __clean_up_mods():
       print(f"  Removing symlink for {item.name}")
     item.unlink()
 
-def __install(group_name, mods):
+def __install(mods):
   for mod in mods:
     src_folder = MODS_SRC_PATH / mod
     # no directory traversal outside MODS_SRC_PATH
@@ -70,6 +72,9 @@ def __get_group_mods(group_name, groups_config, depth=0):
   if "groups" in group:
     # TODO: memoize
     for subgroup in group["groups"]:
+      if not subgroup in groups_config:
+        print(f"Group '{subgroup}' is referenced in '{group_name}' but is undefined", file=stderr)
+        exit(EXIT_CODES.GROUP_DOES_NOT_EXIST_IN_CONFIG.value)
       mods.extend(__get_group_mods(subgroup, groups_config, depth+1))
   return mods
 
@@ -106,6 +111,12 @@ def main():
   if verbose:
     print(dumps(group_mods, indent=2))
 
+  # Check that all groups are valid before we install
+  for group_name in args.groups:
+    if not group_name in group_mods:
+      print(f"Group '{group_name}' does not exist", file=stderr)
+      exit(EXIT_CODES.GROUP_DOES_NOT_EXIST_IN_INPUT.value)
+
   if verbose:
     print("Installing mods...")
   __clean_up_mods()
@@ -113,7 +124,7 @@ def main():
   for group_name in args.groups:
     if verbose:
       print(f"Installing group {group_name}")
-    __install(group_name, group_mods[group_name])
+    __install(group_mods[group_name])
 
   if args.clear_blacklist:
     if verbose:
