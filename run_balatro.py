@@ -29,7 +29,6 @@ def __clean_up_mods():
     item.unlink()
 
 def __install(group_name, mods):
-  print(group_name, mods)
   for mod in mods:
     src_folder = MODS_SRC_PATH / mod
     # no directory traversal outside MODS_SRC_PATH
