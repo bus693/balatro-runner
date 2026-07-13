@@ -1,0 +1,67 @@
+{
+  "evil": {
+    "mods": [
+      "bus693/imaginary"
+    ]
+  },
+  "core": {
+    "groups": [
+      "_qol"
+    ]
+  },
+  "balaparty": {
+    "mods": [
+      "ashraf17m/BalatroMultiplayerExperimental"
+    ],
+    "groups": [
+      "_qol",
+      "_smods",
+      "_smods_qol"
+    ]
+  },
+  "bundles": {
+    "mods": [
+      "GeorgeTheRat/bundlesoffun"
+    ],
+    "groups": [
+      "_qol",
+      "_smods",
+      "_smods_qol"
+    ]
+  },
+  "debug": {
+    "mods": [
+      "WilsontheWolf/DebugPlus"
+    ]
+  },
+  "rebal": {
+    "mods": [
+      "lilaclila/bettersmods",
+      "lilaclila/Rebalatro"
+    ],
+    "groups": [
+      "_qol",
+      "_smods_qol"
+    ]
+  },
+  "_qol": {
+    "mods": [
+      "bus693/balatro-typist-mod",
+      "bus693/bus-dash",
+      "bus693/keyhistory",
+      "bus693/NoTilt",
+      "nh6574/JokerDisplay"
+    ]
+  },
+  "_smods": {
+    "mods": [
+      "Steamodded/smods"
+    ]
+  },
+  "_smods_qol": {
+    "mods": [
+      "bus693/SweetShop",
+      "MeraGenio/UnBlind"
+    ]
+  }
+}
