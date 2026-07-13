@@ -71,6 +71,7 @@ def __install(mods):
     if not mod_src_folder.resolve().is_dir():
       # TODO: install
       print(f"Cannot find mod {mod}, skipping", file=stderr)
+      continue
 
     target_mod_name = "@".join(mod.split("/"))
     posix_target = MODS_INSTALL_PATH / target_mod_name
