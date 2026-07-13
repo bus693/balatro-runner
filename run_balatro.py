@@ -5,7 +5,7 @@ from pathlib import Path
 from subprocess import run
 from sys import excepthook, exit, stderr
 
-MODS_SRC_PATH = Path("~/Documents/balatro/mods/").expanduser()
+FOLDERS_JSON = Path(__file__).parent / "folders.json"
 MODS_INSTALL_PATH = Path("~/Library/Application Support/Balatro/Mods/").expanduser()
 LOVELY_BLACKLIST_PATH = Path("~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt").expanduser()
 LOVELY_RUNNER_PATH = Path("~/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely_macos.sh").expanduser()
@@ -18,6 +18,32 @@ class EXIT_CODES(Enum):
   SIGINT = 130,
 
 verbose = None
+
+def __setup_folders_json():
+  yes = set(['y', 'yes'])
+  exists = False
+  should_create = False
+  print("Welcome to balatro-runner. One setup step before we start.")
+  while not (exists or should_create):
+    mod_folder = input("Where are your mods?\n  Example: ~/Documents/balatro/mods\n> ")
+    if mod_folder == "":
+      print("Enter a valid folder.")
+      continue
+    if Path(mod_folder).expanduser().resolve().exists():
+      exists = True
+    else:
+      should_create = input(f"{mod_folder} does not exist, would you like to create it (y/n)?\n> ").strip().lower() in yes
+  if should_create:
+    print(f"Creating folder at {mod_folder}")
+    Path(mod_folder).expanduser().mkdir(parents=True, exist_ok=False)
+  folders_json = {
+    "mod_source": str(Path(mod_folder))
+  }
+  print(f"Writing folder settings to {FOLDERS_JSON}. You can change it here later.")
+  with open(FOLDERS_JSON, "w", encoding="utf-8") as f:
+    f.writelines(dumps(folders_json, indent=2))
+  print("Setup complete. Run balatro-runner again to start the game.")
+  exit(0)
 
 def __clean_up_mods():
   if verbose:
@@ -32,15 +58,17 @@ def __clean_up_mods():
 
 def __install(mods):
   for mod in mods:
-    src_folder = MODS_SRC_PATH / mod
+    with open(FOLDERS_JSON) as f:
+      src_folder = Path(loads("".join(f.readlines()))["mod_source"]).expanduser()
+    mod_src_folder = src_folder / mod
     # no directory traversal outside MODS_SRC_PATH
-    is_safe_location = src_folder.resolve().is_relative_to(MODS_SRC_PATH)
+    is_safe_location = mod_src_folder.resolve().is_relative_to(src_folder)
     if not is_safe_location:
       print(f"Location not allowed {mod}", file=stderr)
       print("Aborting", file=stderr)
       exit(EXIT_CODES.MOD_OUTSIDE_MODS_FOLDER.value)
 
-    if not src_folder.resolve().is_dir():
+    if not mod_src_folder.resolve().is_dir():
       # TODO: install
       print(f"Cannot find mod {mod}, skipping", file=stderr)
 
@@ -48,7 +76,7 @@ def __install(mods):
     posix_target = MODS_INSTALL_PATH / target_mod_name
     if verbose:
       print(f"  Creating symlink for {mod}")
-    posix_target.symlink_to(src_folder)
+    posix_target.symlink_to(mod_src_folder)
 
 def __get_group_mods_from_config():
   groups_config_path = Path(__file__).parent / "groups.json"
@@ -95,6 +123,11 @@ def main():
   args = parser.parse_args()
   global verbose
   verbose = args.verbose
+
+  folders_json = Path(__file__).parent / "folders.json"
+
+  if not folders_json.exists():
+    __setup_folders_json()
 
   print("Running Balatro via bus693/balatro-runner")
 
