@@ -7,8 +7,8 @@ from sys import excepthook, exit, stderr
 
 MODS_SRC_PATH = Path("~/Documents/balatro/mods/").expanduser()
 MODS_INSTALL_PATH = Path("~/Library/Application Support/Balatro/Mods/").expanduser()
-LOVELY_BLACKLIST_PATH = "~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt"
-LOVELY_RUNNER_PATH = "~/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely_macos.sh"
+LOVELY_BLACKLIST_PATH = Path("~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt").expanduser()
+LOVELY_RUNNER_PATH = Path("~/Library/Application Support/Steam/steamapps/common/Balatro/run_lovely_macos.sh").expanduser()
 
 class EXIT_CODES(Enum):
   DEPTH_EXCEEDED = 3,
@@ -79,14 +79,13 @@ def __get_group_mods(group_name, groups_config, depth=0):
   return mods
 
 def __clear_blacklist():
-  blacklist_loc = Path("~/Library/Application Support/Balatro/Mods/lovely/blacklist.txt").expanduser()
-  if not blacklist_loc.exists():
+  if not LOVELY_BLACKLIST_PATH.exists():
     print("  blacklist.txt does not exist; did not clear.", file=stderr)
     return
-  if not blacklist_loc.is_file():
+  if not LOVELY_BLACKLIST_PATH.is_file():
     print("  blacklist.txt is not a file; did not clear.", file=stderr)
     return
-  blacklist_loc.write_text("")
+  LOVELY_BLACKLIST_PATH.write_text("")
 
 def main():
   parser = ArgumentParser()
@@ -137,7 +136,7 @@ def main():
   if verbose:
     print("Running Balatro...")
 
-  run(["sh", Path(LOVELY_RUNNER_PATH).expanduser()])
+  run(["sh", LOVELY_RUNNER_PATH])
 
    
 try:
